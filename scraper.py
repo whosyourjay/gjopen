@@ -2,6 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import re
 import sys
+import threading
 
 question = sys.argv[1]
 guess_count = int(sys.argv[2])
@@ -20,15 +21,17 @@ cookie = '__cfduid =' + cfduid \
 headers={'User-Agent':user_agent,
         'Cookie':cookie}
 
-guesses = []
-for page in range(1, (guess_count + 19)//10): # Round up and add 1
-    request = urllib.request.Request(url + str(page), None, headers)
+page_count = (guess_count + 9)//10 # Roud up
+guesses = [[] for _ in range(page_count)]
+def fetch_page(page):
+
+    request = urllib.request.Request(url + str(page + 1), None, headers)
     response = urllib.request.urlopen(request)
     data = response.read().decode('utf-8')
     soup = BeautifulSoup(data, 'html.parser')
 
     if soup.find(class_ = 'empty-text'):
-        break
+        return []
 
     for guess in soup.find_all(class_ = 'prediction-set-info'):
         user = guess.find(class_ = 'membership-username').text
@@ -42,10 +45,19 @@ for page in range(1, (guess_count + 19)//10): # Round up and add 1
         if boolean:
             percents.append(100 - percents[0])
         
-        guesses.append((user, tuple(percents)))
+        guesses[page].append((user, tuple(percents)))
 
-    print("%s guesses found" % len(guesses))
+    print("page %d done" % page)
 
+threads = [threading.Thread(target=fetch_page, args=(page,))
+    for page in range(page_count)]
+for thread in threads:
+    thread.start()
+for thread in threads:
+    thread.join()
+
+# flatten
+guesses = [item for page in guesses for item in page]
 guesses.reverse()
 
 with open('gjo-' + question, 'a') as f:
