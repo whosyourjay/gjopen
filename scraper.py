@@ -7,7 +7,10 @@ import threading
 question = sys.argv[1]
 guess_count = int(sys.argv[2])
 boolean = sys.argv[3] == 'True'
-print(boolean)
+parallel = sys.argv[4] == 'True'
+
+print("boolean question %s" % boolean)
+print("parallel %s" % parallel)
 
 url = 'https://www.gjopen.com/comments?id=junk&filters=&commentable_id=' \
     + question \
@@ -21,7 +24,7 @@ cookie = '__cfduid =' + cfduid \
 headers={'User-Agent':user_agent,
         'Cookie':cookie}
 
-page_count = (guess_count + 9)//10 # Roud up
+page_count = (guess_count + 9)//10 # Round up
 guesses = [[] for _ in range(page_count)]
 def fetch_page(page):
 
@@ -31,6 +34,7 @@ def fetch_page(page):
     soup = BeautifulSoup(data, 'html.parser')
 
     if soup.find(class_ = 'empty-text'):
+        print("empty page")
         return []
 
     for guess in soup.find_all(class_ = 'prediction-set-info'):
@@ -49,16 +53,23 @@ def fetch_page(page):
 
     print("page %d done" % page)
 
-threads = [threading.Thread(target=fetch_page, args=(page,))
-    for page in range(page_count)]
-for thread in threads:
-    thread.start()
-for thread in threads:
-    thread.join()
+if parallel:
+    threads = [threading.Thread(target=fetch_page, args=(page,))
+        for page in range(page_count)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+else:
+    for page in range(page_count):
+        fetch_page(page)
 
-# flatten
+# Flatten
 guesses = [item for page in guesses for item in page]
 guesses.reverse()
+# Discard extras on last page
+# Todo Smarter merge
+guesses = guesses[-guess_count:]
 
 with open('gjo-' + question, 'a') as f:
     for user, vals in guesses:

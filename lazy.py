@@ -25,28 +25,36 @@ with open('pros', 'r') as f:
 # Todo keep order
 last_guess = {}
 pro_guess = {}
+
+# Track when guess was made
+time = 0
 with open('gjo-' + question, 'r') as f:
     for line in f:
         name, *vals = line.split()
         last_guess[name] = tuple(map(int, vals))
         if name in pros:
-            pro_guess[name] = tuple(map(int, vals))
+            pro_guess[name] = [time] + list(map(int, vals))
+        time += 1
 
 f.close()
-
-answer_count = len(list(pro_guess.values())[0])
 
 if len(pro_guess) < 3:
     print("too little data")
     exit(0)
 
+answer_count = len(list(pro_guess.values())[0]) - 1
+
+# Nice to look at these in order 
+pros_by_time = [[pro, *pro_guess[pro]] for pro in pro_guess]
+pros_by_time = sorted(pros_by_time, key=lambda x: x[1])
 print("%s pros" % len(pro_guess))
-for name in pro_guess:
-    print("%s %s" % (name, pro_guess[name]))
+for pro in pros_by_time:
+    print(pro)
 
 # Find the median in each bin for pros
 all_vals = [[] for _ in range(answer_count)]
-for vals in list(pro_guess.values()):
+# Even pros have stale guesses
+for _, _, *vals in pros_by_time[-5:]:
     for pos in range(answer_count):
         all_vals[pos].append(vals[pos])
 med_vals = [median(vals) for vals in all_vals]
