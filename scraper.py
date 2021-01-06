@@ -6,8 +6,9 @@ import threading
 
 question = sys.argv[1]
 guess_count = int(sys.argv[2])
-boolean = sys.argv[3] == 'True'
-parallel = sys.argv[4] == 'True'
+boolean = sys.argv[3].lower() == 'true'
+#parallel = sys.argv[4].lower() == 'true'
+parallel = False
 
 print("boolean question %s" % boolean)
 print("parallel %s" % parallel)
@@ -17,12 +18,7 @@ url = 'https://www.gjopen.com/comments?id=junk&filters=&commentable_id=' \
     + '&commentable_type=Forecast::Question&page='
 
 user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7' # Not sure we need this
-cfduid = 'd8e9b00b9078960925c6921dfc5812f5a1607637346'
-flyover = 'iXu2f3vHotIzTgRhtGgRmmXdgQ//CiHTBrY6FAncK7RnJG7dRcQh1S/1oapuPAJqdTx1DAvFix4pigoSsbK3kupjaY593n1jNuccD1YVoQTsk3tz2HyDdOBqeAaD6+bblcrFuslM+ZWFWO8RGavPPawGm0WkKbuoQdWHWTey2iiILbOV6dYAspOR7adsuzD8vetXmy61bR5rL2jHik0qIOkzweesIRek7xr17KRWWuGE5DAu17TXhvneES2L44aVeq9RVxFQs4cJ1qQqrmo7v8cMdGfLtFCJ5S6iV/glflqipu6C66df9LmNPKxxZhIw4LlONxNx3Ss7usrzTuwznsgLrXUzwuuTKgg5th5BoJJB6HXZmwZ0wHMJ5AIB13J9db8B2P48NnE8Y4ISogV3agkQqG68AraV8lNVqW7MbnksBugqD8JfzuoUTll0QcOijSsOP9voQZSOHkHRMWnx7FDLnm91vbCqCKp6Wku/yvTAeoYK4kQ8BdWLWKp2K6UEWcuJBYFkpj8IpoCTeg27Jh01+8JXz9tQQPgKyBFHrjMnrDKvBQJobscsEi93gKeax3I=--qI9m2g9uk+sEbM+C--VeHD16MgEtkxLObbhqMb7g=='
-cookie = '__cfduid =' + cfduid \
-    + '; _gj_prod_flyover_forecasts_session =' + flyover
-headers={'User-Agent':user_agent,
-        'Cookie':cookie}
+headers={'User-Agent':user_agent}
 
 page_count = (guess_count + 9)//10 # Round up
 guesses = [[] for _ in range(page_count)]

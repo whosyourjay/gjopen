@@ -69,10 +69,11 @@ for name in last_guess:
     score = brier(last_guess[name], your_vals)/10**6
     if score > 2:
         continue
-    scores.append(score)
+    scores.append(round(score, 3))
     #print("%s %s %.3f" % (name, ' '.join(map(str, last_guess[name])), score))
 
-print(sorted(scores))
+mid = len(scores)//2
+print(sorted(scores)[mid-10:mid+1])
 med_score = median(scores)
 your_score = brier(your_vals, your_vals)/10**6
 
