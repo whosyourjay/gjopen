@@ -38,18 +38,18 @@ with open('gjo-' + question, 'r') as f:
 
 f.close()
 
-if len(pro_guess) < 3:
-    print("too little data")
-    exit(0)
-
-answer_count = len(list(pro_guess.values())[0]) - 1
-
 # Nice to look at these in order 
 pros_by_time = [[pro, *pro_guess[pro]] for pro in pro_guess]
 pros_by_time = sorted(pros_by_time, key=lambda x: x[1])
 print("%s pros" % len(pro_guess))
 for pro in pros_by_time:
     print(pro)
+
+if len(pro_guess) < 1:
+    print("too little data")
+    exit(0)
+
+answer_count = len(list(pro_guess.values())[0]) - 1
 
 # Find the median in each bin for pros
 all_vals = [[] for _ in range(answer_count)]
